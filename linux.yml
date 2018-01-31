@@ -1,0 +1,43 @@
+---
+- hosts: linux
+  name: Secure my Linux Estate
+  tasks:
+  - name: Update bash - RHEL
+    yum:
+      name: bash
+      state: latest
+      update_cache: yes
+    when: ansible_os_family == "RedHat"
+  - name: Update bash - Ubuntu
+    apt:
+      name: bash
+      state: latest
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+  - name: CVE-2016-5696 | Limit TCP challenge ACK limit
+    sysctl:
+      name: net.ipv4.tcp_challenge_ack_limit
+      value: 999999999
+      sysctl_set: yes
+  - name: Find logs
+    find:
+      paths: /var/log/
+      patterns: 'waagent.log'
+      recurse: yes
+    register: _logs
+  - name: Fetch logs
+    fetch:
+      src: "{{ item.path }}"
+      dest: /var/tmp/logs
+    with_items: "{{ _logs.files }}"
+  - name: "HIGH PRIORITY PATCH | SSH daemon must not allow empty passwords."
+    lineinfile:
+      state: present
+      dest: /etc/ssh/sshd_config
+      regexp: ^#?PermitEmptyPasswords
+      line: PermitEmptyPasswords no
+      validate: sshd -tf %s
+  - name: Restart SSH
+    service:
+      name: sshd
+      state: restarted
