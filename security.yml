@@ -1,0 +1,75 @@
+---
+- hosts: linux
+  name: Secure my Linux Estate
+  tasks:
+  - name: Update bash - RHEL
+    yum:
+      name: bash
+      state: latest
+      update_cache: yes
+    when: ansible_os_family == "RedHat"
+
+  - name: Update bash - Ubuntu
+    apt:
+      name: bash
+      state: latest
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+
+  - name: CVE-2016-5696 | Limit TCP challenge ACK limit
+    sysctl:
+      name: net.ipv4.tcp_challenge_ack_limit
+      value: 999999999
+      sysctl_set: yes
+
+  - name: Test CVE-2014-6271
+    shell: 'env x=''() { :;}; echo vulnerable'' bash -c "echo this is a test"'
+    args:
+      executable: /bin/bash
+    register: CVE_2014_6271
+    failed_when: CVE_2014_6271.stdout | search('vulnerable')
+    ignore_errors: yes
+    changed_when: no
+
+  - name: Test CVE-2014-7169
+    shell: "env X='() { (a)=>\' bash -c 'echo date'; cat echo"
+    args:
+      executable: /bin/bash
+      chdir: /tmp
+    register: CVE_2014_7169
+    failed_when:
+      - not CVE_2014_7169.stdout | search('date')
+      - not CVE_2014_7169.stderr | search('No such file or directory')
+    ignore_errors: yes
+    changed_when: no
+
+  - name: Cleanup after CVE-2014-7169 test
+    file:
+      path: /tmp/echo
+      state: absent
+
+  - name: Find logs
+    find:
+      paths: /var/log/
+      patterns: 'waagent.log'
+      recurse: yes
+    register: _logs
+
+  - name: Fetch logs
+    fetch:
+      src: "{{ item.path }}"
+      dest: /var/tmp/logs
+    with_items: "{{ _logs.files }}"
+
+  - name: "HIGH PRIORITY PATCH | SSH daemon must not allow empty passwords."
+    lineinfile:
+      state: present
+      dest: /etc/ssh/sshd_config
+      regexp: ^#?PermitEmptyPasswords
+      line: PermitEmptyPasswords no
+      validate: sshd -tf %s
+
+  - name: Restart SSH
+    service:
+      name: sshd   
+      state: restarted
