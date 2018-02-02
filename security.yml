@@ -9,13 +9,6 @@
       update_cache: yes
     when: ansible_os_family == "RedHat"
 
-  - name: Update bash - Ubuntu
-    apt:
-      name: bash
-      state: latest
-      update_cache: yes
-    when: ansible_os_family == "Debian"
-
   - name: CVE-2016-5696 | Limit TCP challenge ACK limit
     sysctl:
       name: net.ipv4.tcp_challenge_ack_limit
