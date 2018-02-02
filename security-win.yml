@@ -8,6 +8,7 @@
     ansible_ssh_port: 5986
     ansible_winrm_server_cert_validation: ignore
     ansible_winrm_kerberos_delegation: yes
+  become: yes
   tasks:
   - name: Enable Windows Firewall
     win_firewall:
