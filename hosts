@@ -1,4 +1,4 @@
 vsrx ansible_connection=local ansible_ssh_host=13.210.240.85 ansible_ssh_user=jnpr ansible_ssh_private_key=/vagrant_data/AnsibleAutomates/ssh.pem
-
+windows ansible_ssh_host=13.70.142.96 KB=KB4049065
 [network]
 vsrx
