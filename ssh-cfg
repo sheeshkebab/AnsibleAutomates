@@ -1,0 +1,10 @@
+Host 13.210.240.85
+ User jnpr 
+ IdentityFile /vagrant_data/AnsibleAutomates/ssh.pem
+ StrictHostKeyChecking no
+
+Host vsrx
+ User jnpr
+ IdentityFile /vagrant_data/AnsibleAutomates/ssh.pem
+ StrictHostKeyChecking no
+ ControlPersist=60s

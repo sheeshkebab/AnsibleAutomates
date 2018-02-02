@@ -1,0 +1,39 @@
+---
+- name: Get Device Facts
+  hosts: vsrx
+  #vars:
+  #  netconf:
+  #    host: "{{ inventory_hostname }}"
+  #    username: jnpr
+  #    ssh_keyfile: ssh.pem
+  #    timeout: 30
+  roles:
+  - Juniper.junos
+  connection: local
+  gather_facts: no
+
+  tasks:
+  - name: Retrieve information from devices running Junos OS
+    #junos_get_facts:
+    junos_facts:
+      #host={{ inventory_hostname }}
+      #user={{ ansible_ssh_user }}
+      #passwd=Automates
+      #ssh_keyfile="{{ ansible_ssh_private_key }}"
+      #provider: "{{ netconf }}"
+    register: junos
+
+  - name: version
+    debug: msg="{{ junos.ansible_facts.ansible_net_version }}"
+
+  - name: De-activate the motd banner
+    junos_banner:
+      banner: motd
+      state: absent
+ #     active: True
+
+  - name: Activate and configure the login banner
+    junos_banner:
+      banner: login
+      text: "{{ lookup('file', 'raw_banner.cfg') }}" 
+      state: present
