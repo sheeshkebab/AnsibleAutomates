@@ -1,26 +1,18 @@
 ---
 - name: Get Device Facts
-  hosts: vsrx
-  #vars:
-  #  netconf:
-  #    host: "{{ inventory_hostname }}"
-  #    username: jnpr
-  #    ssh_keyfile: ssh.pem
-  #    timeout: 30
+  hosts: network 
   roles:
   - Juniper.junos
   connection: local
   gather_facts: no
 
   tasks:
+
+  - name: Verifying NETCONF
+    wait_for: host={{ ansible_ssh_host }}  port=830      # variable defined in inventory file
+
   - name: Retrieve information from devices running Junos OS
-    #junos_get_facts:
     junos_facts:
-      #host={{ inventory_hostname }}
-      #user={{ ansible_ssh_user }}
-      #passwd=Automates
-      #ssh_keyfile="{{ ansible_ssh_private_key }}"
-      #provider: "{{ netconf }}"
     register: junos
 
   - name: version
@@ -30,7 +22,6 @@
     junos_banner:
       banner: motd
       state: absent
- #     active: True
 
   - name: Activate and configure the login banner
     junos_banner:
