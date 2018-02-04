@@ -1,6 +1,7 @@
 ---
 - hosts: linux
   name: Secure my Linux Estate
+  gather_facts: no
   tasks:
 
   - name: CVE-2016-5696 | Limit TCP challenge ACK limit
