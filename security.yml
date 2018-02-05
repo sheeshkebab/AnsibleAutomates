@@ -1,15 +1,20 @@
 ---
-- hosts: linux
-  name: Secure my Linux Estate
-  gather_facts: no
+- name: Secure my Linux Estate
+# where do you want me to run this playbook ?
+  hosts: linux
+  become: yes
+  gather_facts: no  # Tower has a cache of these already :)
   tasks:
 
+# tests to see if the host is susceptible to a TCP flood attack
   - name: CVE-2016-5696 | Limit TCP challenge ACK limit
     sysctl:
       name: net.ipv4.tcp_challenge_ack_limit
       value: 999999999
       sysctl_set: yes
 
+# test if bash vulnerable to shell shock
+# Recursive fork/exec hack
   - name: Test CVE-2014-6271
     shell: 'env x=''() { :;}; echo vulnerable'' bash -c "echo this is a test"'
     args:
@@ -19,6 +24,8 @@
     ignore_errors: yes
     changed_when: no
 
+# test if bash vulnerable to shell shock
+# Recursive fork/exec hack
   - name: Test CVE-2014-7169
     shell: "env X='() { (a)=>\' bash -c 'echo date'; cat echo"
     args:
@@ -31,11 +38,13 @@
     ignore_errors: yes
     changed_when: no
 
+# cleanup after shell shock test
   - name: Cleanup after CVE-2014-7169 test
     file:
       path: /tmp/echo
       state: absent
 
+# register some logs for retrospective analysis
   - name: Find logs
     find:
       paths: /var/log/
@@ -43,12 +52,14 @@
       recurse: yes
     register: _logs
 
+#copy the logs off onto control node
   - name: Fetch logs
     fetch:
       src: "{{ item.path }}"
       dest: /var/tmp/logs
     with_items: "{{ _logs.files }}"
 
+# check SSH configuration is hardened
   - name: "HIGH PRIORITY PATCH | SSH daemon must not allow empty passwords."
     lineinfile:
       state: present
@@ -57,6 +68,7 @@
       line: PermitEmptyPasswords no
       validate: sshd -tf %s
 
+# restart ssh
   - name: Restart SSH
     service:
       name: sshd   
