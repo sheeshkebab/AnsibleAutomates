@@ -1,5 +1,5 @@
 ---
-- name: Apply ACL Junos
+- name: Apply ACL to IOS 
   hosts: network
   connection: local
   tasks:
@@ -11,7 +11,7 @@
         parents: ip access-list extended test
         before: no ip access-list extended test 
 
-  - name: configure interface settings
+  - name: Configure interface settings
     ios_config:
       lines:
         - description test interface
