@@ -9,12 +9,8 @@
     ansible_winrm_server_cert_validation: ignore
     ansible_winrm_kerberos_delegation: yes
   tasks:
-  - name: Enable Windows Firewall
-    win_firewall:
-      state: disabled 
-      profiles:
-        - Private
-        - Domain
+
+# Disable anonymous users from enumrating shares.
   - name: Restrict enumeration of shares
     win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Lsa'
@@ -22,6 +18,7 @@
         data: 1
         datatype: dword
 
+# 
   - name: Microsoft Online Accounts | microsoft-online-accounts
     win_regedit:
       path: HKLM:\SOFTWARE\Microsoft\PolicyManager\default\Settings\AllowYourAccount

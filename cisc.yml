@@ -2,6 +2,11 @@
   hosts: network
   connection: local
   tasks:
+
+# protect against internet outbreaks using ACL's.
+# Guard against a UDP flood attack. NTP Reflection attack.
+# Block DNS zone transfers etc...?
+
    - name: Create Management ACL
      ios_config:
       lines:
