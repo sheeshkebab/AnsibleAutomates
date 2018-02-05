@@ -8,7 +8,6 @@
     ansible_ssh_port: 5986
     ansible_winrm_server_cert_validation: ignore
     ansible_winrm_kerberos_delegation: yes
-  become: yes
   tasks:
   - name: Enable Windows Firewall
     win_firewall:
@@ -16,7 +15,6 @@
       profiles:
         - Private
         - Domain
-
   - name: Restrict enumeration of shares
     win_regedit:
         key: 'HKLM:\System\CurrentControlSet\Control\Lsa'
@@ -24,12 +22,6 @@
         data: 1
         datatype: dword
 
-#  - name: Install security updates
-#    win_updates:
-#      category_name: "{{ win_update_category_name | default('SecurityUpdates') }}"
-#      state: installed
-#    ignore_errors: yes
-#    notify: reboot windows
   - name: Microsoft Online Accounts | microsoft-online-accounts
     win_regedit:
       path: HKLM:\SOFTWARE\Microsoft\PolicyManager\default\Settings\AllowYourAccount
