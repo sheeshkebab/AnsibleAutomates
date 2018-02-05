@@ -1,0 +1,27 @@
+---
+- name: Apply ACL Junos
+  hosts: network
+  connection: local
+  tasks:
+  - name: Create management ACL
+    ios_config:
+        lines:
+          - 10 permit ip host 192.168.1.99 any log
+          - 20 permit ip host 192.168.1.121 any log
+        parents: ip access-list extended test
+        before: no ip access-list extended test 
+
+  - name: configure interface settings
+    ios_config:
+      lines:
+        - description test interface
+        - ip address 1.1.1.1 255.255.255.0
+      parents: interface GigabitEthernet1
+
+#  - name: Harden VTY lines
+#    ios_config:
+#       parents: line vty 0 15
+#       lines:
+#         - exec-timeout 15
+#         - transport input ssh
+#         - access mgmnt in
