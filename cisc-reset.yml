@@ -1,0 +1,19 @@
+- name: Remove IOS configuration for demo
+  hosts: network
+  connection: local
+  tasks:
+   - name: Remove Management ACL
+     ios_config:
+      lines:
+       - no ip access-list extended test
+   - name: Remove access list from interface
+     ios_config:
+      lines:
+       - no ip access-group test in
+      parents: "interface GigabitEthernet2"
+   - name: set logging of ssh events
+     ios_config:
+      lines:
+       - login on-success log
+       - login on-failure log
+       - logging buffered 512000000
