@@ -16,27 +16,33 @@
 # test if bash vulnerable to shell shock
 # Recursive fork/exec hack
   - name: Test CVE-2014-6271
-    shell: 'env x=''() { :;}; echo vulnerable'' bash -c "echo this is a test"'
+    shell: env x='() { :;}; echo vulnerable' bash -c "echo this is a test" 
     args:
       executable: /bin/bash
     register: CVE_2014_6271
     failed_when: CVE_2014_6271.stdout | search('vulnerable')
     ignore_errors: yes
     changed_when: no
+    tags: rjh
 
-# test if bash vulnerable to shell shock
-# Recursive fork/exec hack
-  - name: Test CVE-2014-7169
-    shell: "env X='() { (a)=>\' bash -c 'echo date'; cat echo"
-    args:
-      executable: /bin/bash
-      chdir: /tmp
-    register: CVE_2014_7169
-    failed_when:
-      - not CVE_2014_7169.stdout | search('date')
-      - not CVE_2014_7169.stderr | search('No such file or directory')
+  - name: ensure bash is not vulnerable to CVE-2014-7169
+    shell: >
+     "cd /tmp; rm -f /tmp/echo; env 'x=() { (a)=>\' bash -c 'echo date'; cat /tmp/echo"
+    register: result
+    failed_when: "'error importing function definition for' in result.stdout"
+    changed_when: false
+    check_mode: yes
     ignore_errors: yes
-    changed_when: no
+    tags: rjh
+
+  - name: ensure bash is not vulnerable to CVE-2014-7186
+    command: >
+      bash -c "true $(printf '<<EOF %.0s' {1..79})"
+    register: result
+    failed_when: "result.rc != 0"
+    changed_when: false
+    check_mode: yes
+    ignore_errors: yes
 
 # cleanup after shell shock test
   - name: Cleanup after CVE-2014-7169 test

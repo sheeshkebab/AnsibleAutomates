@@ -1,6 +1,19 @@
-vsrx ansible_connection=local ansible_ssh_host=54.153.164.8 ansible_ssh_user=jnpr ansible_ssh_private_key=/vagrant_data/AnsibleAutomates/ssh.pem
-cisco ansible_connection=local ansible_ssh_host=13.210.143.221 ansible_ssh_user=ec2-user ansible_ssh_private_key=/vagrant_data/AnsibleAutomates/ssh.pem
-windows ansible_ssh_host=13.70.142.96 KB=KB4049065
-[network]
-cisco
+[windows]
+10.64.30.61 KB=KB4049065
 
+[linux]
+rjhins05.anzlab.bne.redhat.com
+rjhins06.anzlab.bne.redhat.com
+rjhins07.anzlab.bne.redhat.com
+rjhins08.anzlab.bne.redhat.com
+rjhins09.anzlab.bne.redhat.com
+rjhins10.anzlab.bne.redhat.com
+
+[windows:vars]
+ansible_ssh_user = administrator
+ansible_ssh_pass = 1800RedHat
+ansible_port = 5985
+ansible_connection = winrm
+ansible_winrm_transport = ntlm 
+ansible_winrm_server_cert_validation = ignore
+ansible_winrm_kerberos_delegation = no
