@@ -1,10 +1,11 @@
 ---
 - name: Plays for running pre-flight checks - RHEL or CentOS LINUX only. 
   hosts: linux 
-  # strategy: debug
+  #strategy: debug
   gather_facts: yes 
   vars:
     - mountname : "/"
+    - threshold: 71   # as a percentage full
   tasks:
 
     - set_fact: my_size_total={{ item.size_total|int / 1024 / 1024 }}
@@ -17,23 +18,19 @@
       - "{{ ansible_mounts }}"
       when: item.mount == "/"
 
+    # This expresses the percentage free as an amount the mount size_total
     - set_fact: my_percentage={{ (my_size_available|int / my_size_total|int)| float * 100 }}
 
-    - name: Percentage free 
-      debug: msg={{ my_percentage|int }}%
+    - name: Percentage full
+      debug: msg={{ 100 - my_percentage|int }} < {{ threshold }}
 
-    - name: Test for available disk space 
+    - name: "Test for disk space threshold < {{ threshold }}%"
       assert:
-        that: 
-        - ( my_percentage|int < 90 ) 
-#        - ( item.size_total - item.size_available ) > item.size_available 
-#        - not ( ( ( item.size_available / 1024 / 1024 )  / (item.size_total / 1024 / 1024 ) | float * 100 ) > 85 ) # need at least 13% free
-#      with_items: '{{ansible_mounts}}'
-#      when: item.mount == mountname
+        that: "( 100 - my_percentage|int ) < threshold|int"
       ignore_errors: yes
       register: disk_free
 
-    - name: Fail the play
-      fail: msg="disk space has reached 10% threshold"
+    - name: Fail the play if disk exceeds threshold
+      fail: msg="disk space has exceeded {{ threshold }}% threshold"
       when: disk_free|failed
 
