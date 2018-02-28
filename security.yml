@@ -3,7 +3,7 @@
 # where do you want me to run this playbook ?
   hosts: linux
   become: yes
-  gather_facts: no
+  gather_facts: yes 
   tasks:
 
 # tests to see if the host is susceptible to a TCP flood attack
