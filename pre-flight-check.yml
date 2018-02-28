@@ -5,7 +5,7 @@
   gather_facts: yes 
   vars:
     - mountname: "/"
-    - threshold: 13   # as a percentage full
+    - threshold: 80   # as a percentage full
   tasks:
     - name: Check disk usage
       block:
