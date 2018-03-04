@@ -1,0 +1,48 @@
+---
+  - name:
+    hosts: localhost
+    gather_facts: no
+    vars:
+      user: admin
+      password: password
+      infoblox: 10.1.1.1
+
+    tasks:
+
+    - name: Create a Network
+      uri:
+        url: https://{{infoblox}}/wapi/v1.2/network
+        method: POST
+        user: "{{ user }}"
+        password: "{{ password }}"
+        body:
+            { "network": "{{network}}" }
+        force_basic_auth: yes
+        status_code: 201
+        validate_certs: no
+        body_format: json
+
+    - name: Create a Authoritative Zone
+      uri:
+        url: https://{{infoblox}}/wapi/v1.2/zone_auth
+        method: POST
+        user: "{{ user }}"
+        password: "{{ password }}"
+        body:
+            { "fqdn": "{{fqdn}}" }
+        force_basic_auth: yes
+        status_code: 201
+        validate_certs: no
+        body_format: json
+
+    - name: Create a DNS Record
+      uri:
+        url: https://{{infoblox}}/wapi/v1.2/record:host
+        method: POST
+        user: "{{ user }}"
+        password: "{{ password }}"
+        body: { "name":"{{dnsname}}","ipv4addrs":[{"ipv4addr":"{{ipaddress}}"}]}
+        force_basic_auth: yes
+        status_code: 201
+        validate_certs: no
+        body_format: json
