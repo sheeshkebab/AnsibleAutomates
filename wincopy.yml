@@ -1,0 +1,17 @@
+---
+- name: Win Copy a file
+  hosts: windows
+  tasks:
+
+
+#  - name: Copy a single file where the source is on the remote host
+#    win_copy:
+#      src: C:\windows8.1-kb4344145-x64.cab
+#      dest: windows8.1-kb4344145-x64.cab 
+#      remote_src: True
+
+  - name: Copy a single file here...
+    fetch:
+      src: C:\windows8.1-kb4344145-x64.cab
+      dest: windows8.1-kb4344145-x64.cab
+      flat: yes

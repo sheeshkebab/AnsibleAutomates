@@ -9,6 +9,21 @@
       category_name:
       - SecurityUpdates
       - CriticalUpdates
-      blacklist:
-      - Windows Malicious Software Removal Tool x64 - August 2018 (KB890830)
-      - \d{4}-\d{2} Security Monthly Quality Rollup for Windows Server 2012 R2 for x64-based Systems (KB4343898)
+      #blacklist:
+      #- Windows Malicious Software Removal Tool x64 - August 2018 (KB890830)
+      #- \d{4}-\d{2} Security Monthly Quality Rollup for Windows Server 2012 R2 for x64-based Systems (KB4343898)
+      #
+  - name: Copy a single file where the source is on the remote host
+    win_copy:
+      src: /var/tmp/windows8.1-kb4344145-x64.cab
+      dest: c:\windows8.1-kb4344145-x64.cab 
+
+  - name: install hotfix validating Identifier
+    win_hotfix:
+      hotfix_identifier: Package_for_KB4344145
+      source: C:\windows8.1-kb4344145-x64.cab
+      state: present
+    register: hotfix_install
+
+#  - win_reboot:
+#    when: hotfix_install.reboot_required
