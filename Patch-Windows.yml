@@ -1,29 +1,46 @@
 ---
 - name : This playbook will run windows update
   hosts: windows 
+  vars:
+    patches:
+      - windowsblue-kb3191564-x64_91d95a0ca035587d4c1babe491f51e06a1529843.msu
+      - windows8.1-kb4344153-x64_be2840f79f50b30e571b229863d5993dfcda0e0d.msu
+      - windows8.1-kb4344145-x64_a8ab9af74e4ff58bb942494ac0d442b9fa2138ca.msu
+      - windows8.1-kb4344147-x64_776ef21945d613cf0eb93a7b3f5e3af61fef83b0.msu
+
   tasks:
 
 
-  - name: Update but Exlude updates based on the update title
-    win_updates:
-      category_name:
-      - SecurityUpdates
-      - CriticalUpdates
+#  - name: Update but Exlude updates based on the update title
+#    win_updates:
+#      category_name:
+#      - SecurityUpdates
+#      - CriticalUpdates
       #blacklist:
       #- Windows Malicious Software Removal Tool x64 - August 2018 (KB890830)
       #- \d{4}-\d{2} Security Monthly Quality Rollup for Windows Server 2012 R2 for x64-based Systems (KB4343898)
-      #
-  - name: Copy a single file where the source is on the remote host
+
+  - name: Copy accross HotFixes 
     win_copy:
-      src: /var/tmp/windows8.1-kb4344145-x64.cab
-      dest: c:\windows8.1-kb4344145-x64.cab 
+      src: "/var/tmp/{{ item }}"
+      dest: C:\
+    with_items: "{{ patches }}"
 
   - name: install hotfix validating Identifier
     win_hotfix:
-      hotfix_identifier: Package_for_KB4344145
-      source: C:\windows8.1-kb4344145-x64.cab
+      hotfix_identifier: "{{ item }}" 
+      source: 'C:\"{{ item }}"'
       state: present
+    with_items: "{{ patches }}"
     register: hotfix_install
 
+
+
+# KB3191564
+# KB4345592
+#  KB4344153
+#  KB4344154
+#  KB4344147
+# 
 #  - win_reboot:
 #    when: hotfix_install.reboot_required
