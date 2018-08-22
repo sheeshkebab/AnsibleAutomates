@@ -29,7 +29,7 @@
   - name: Install HotFixes 
     win_hotfix:
       #hotfix_identifier: "{{ item }}" 
-      source: 'C:"{{ item }}"'
+      source: "C:{{ item }}"
       state: present
     with_items: "{{ patches }}"
     register: hotfix_install
