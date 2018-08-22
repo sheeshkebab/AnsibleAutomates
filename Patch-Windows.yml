@@ -23,10 +23,10 @@
   - name: Copy accross HotFixes 
     win_copy:
       src: "/var/tmp/{{ item }}"
-      dest: C:\
+      dest: C:
     with_items: "{{ patches }}"
 
-  - name: install hotfix validating Identifier
+  - name: Install HotFixes 
     win_hotfix:
       hotfix_identifier: "{{ item }}" 
       source: "C:{{ item }}"
